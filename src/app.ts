@@ -64,7 +64,7 @@ apiRouter.get('/devices', async (req, res) => {
       deviceSessionMap[session.udid].push(session);
     });
     devices = devices.map((d) => {
-      d.dashboard_link = `${dashboardPluginUrl}?device_udid=${d.udid}&start_time=${serverUpTime}`;
+      d.dashboard_link = `/dashboard?device_udid=${d.udid}&start_time=${serverUpTime}`;
       d.total_session_count = deviceSessionMap[d.udid]?.length || 0;
       return d;
     });
