@@ -76,36 +76,47 @@ export default class DeviceCard extends React.Component<IDeviceCardProps, any> {
     const hostName = host.split(':')[1].replace('//', '');
     return (
       <div className={`device-info-card-container ${this.getStatusClassName()}`}>
+        <div className={`device-state ${deviceState}`}>{deviceState}</div>
         <div className="device-info-card-container__title_wrapper">
+          <div className="code device-info-card-container__device-title">{udid}</div>
           {['ios', 'tvos'].includes(platform) ? (
             <AppleIcon className="device-info-card-container__device-icon" />
           ) : (
             <AndroidIcon className="device-info-card-container__device-icon" />
           )}
-          <div className="code device-info-card-container__device-title">{udid}</div>
-          <div className={`device-state ${deviceState}`}>{deviceState}</div>
         </div>
         <div className="device-info-card-container__body">
           <div className="device-info-card-container__body_row">
             <div className="device-info-card-container__body_row_label">Version:</div>
-            <div className="device-info-card-container__body_row_value">{sdk}</div>
+            <div className="device-info-card-container__body_row_value" title={sdk}>
+              {sdk}
+            </div>
           </div>
           <div className="device-info-card-container__body_row">
             <div className="device-info-card-container__body_row_label">Name:</div>
-            <div className="device-info-card-container__body_row_value">{name}</div>
+            <div className="device-info-card-container__body_row_value" title={name}>
+              {name}
+            </div>
           </div>
           <div className="device-info-card-container__body_row">
             <div className="device-info-card-container__body_row_label">Device Type:</div>
-            <div className="device-info-card-container__body_row_value">{deviceType}</div>
+            <div className="device-info-card-container__body_row_value" title={deviceType}>
+              {deviceType}
+            </div>
           </div>
           <div className="device-info-card-container__body_row">
             <div className="device-info-card-container__body_row_label">Device Location:</div>
-            <div className="device-info-card-container__body_row_value">{hostName}</div>
+            <div className="device-info-card-container__body_row_value" title={hostName}>
+              {hostName}
+            </div>
           </div>
           {totalUtilizationTimeMilliSec != null && (
             <div className="device-info-card-container__body_row">
               <div className="device-info-card-container__body_row_label">Utilization:</div>
-              <div className="device-info-card-container__body_row_value">
+              <div
+                className="device-info-card-container__body_row_value"
+                title={prettyMilliseconds(totalUtilizationTimeMilliSec)}
+              >
                 {prettyMilliseconds(totalUtilizationTimeMilliSec)}
               </div>
             </div>

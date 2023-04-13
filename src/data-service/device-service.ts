@@ -60,7 +60,7 @@ export function getDevice(filterOptions: IDeviceFilterOptions): IDevice {
   var results = DeviceModel.chain();
 
   if (semver.coerce(filterOptions.minSDK)) {
-    results = results.where(function(obj: IDevice) {
+    results = results.where(function (obj: IDevice) {
       if (semver.coerce(obj.sdk)) {
         return semver.gte(semver.coerce(obj.sdk), semver.coerce(filterOptions.minSDK));
       }
@@ -69,7 +69,7 @@ export function getDevice(filterOptions: IDeviceFilterOptions): IDevice {
   }
 
   if (semver.coerce(filterOptions.maxSDK)) {
-    results = results.where(function(obj: IDevice) {
+    results = results.where(function (obj: IDevice) {
       if (semver.coerce(obj.sdk)) {
         return semver.lte(semver.coerce(obj.sdk), semver.coerce(filterOptions.maxSDK));
       }
@@ -100,7 +100,7 @@ export function getDevice(filterOptions: IDeviceFilterOptions): IDevice {
     } else {
       filter.state = 'Shutdown';
     }
-  }  
+  }
 
   return results.find(filter).data()[0];
 }
@@ -144,23 +144,26 @@ export function updateCmdExecutedTime(sessionId: string) {
     });
 }
 
-export async function unblockDevice(sessionId: string) {
-  const device = DeviceModel.chain().find({ session_id: sessionId }).data()[0];
-  const sessionStart = device.sessionStartTime;
-  const currentTime = new Date().getTime();
-  const utilization = currentTime - sessionStart;
-  const totalUtilization = device.totalUtilizationTimeMilliSec + utilization;
-  await setUtilizationTime(device.udid, totalUtilization);
-  DeviceModel.chain()
-    .find({
-      session_id: sessionId,
-    })
-    .update(function (device: IDevice) {
-      device.session_id = undefined;
-      device.busy = false;
-      device.lastCmdExecutedAt = undefined;
-      device.sessionStartTime = 0;
-      device.totalUtilizationTimeMilliSec = totalUtilization;
-      device.newCommandTimeout = undefined;
-    });
+export async function unblockDevice(filter: object) {
+  const device = DeviceModel.chain().find(filter).data()[0];
+  if (device !== undefined) {
+    console.log(`Found device with udid ${device.udid} to unblock with filter ${JSON.stringify(filter)}`);
+    const sessionStart = device.sessionStartTime;
+    const currentTime = new Date().getTime();
+    const utilization = currentTime - sessionStart;
+    const totalUtilization = device.totalUtilizationTimeMilliSec + utilization;
+    await setUtilizationTime(device.udid, totalUtilization);
+    DeviceModel.chain()
+      .find(filter)
+      .update(function (device: IDevice) {
+        device.session_id = undefined;
+        device.busy = false;
+        device.lastCmdExecutedAt = undefined;
+        device.sessionStartTime = 0;
+        device.totalUtilizationTimeMilliSec = totalUtilization;
+        device.newCommandTimeout = undefined;
+      });
+  } else {
+    console.log(`Not able to find device to unblock with filter ${JSON.stringify(filter)}`);
+  }
 }
